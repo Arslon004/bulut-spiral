@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7x7 Spiral Matritsa</title>
+    <style>
+        /* Umumiy uslublar */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 28px;
+        }
+
+        .direction-selection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .direction-selection label {
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .direction-selection input {
+            margin-right: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .matrix {
+            margin-top: 25px;
+            display: inline-block;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ccc;
+            margin: 1px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #d1e7dd;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+
+            .cell {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>7x7 Spiral Matritsa</h1>
+        <div class="direction-selection">
+            <label>
+                <input type="radio" name="direction" value="true" checked>
+                Soat strelkasi bo'yicha
+            </label>
+            <label>
+                <input type="radio" name="direction" value="false">
+                Soat strelkasi qarama-qarshi
+            </label>
+        </div>
+        <button onclick="generateAndDisplayMatrix()">Matritsa Yaratish</button>
+        <div id="matrix" class="matrix"></div>
+    </div>
+
+    <script>
+        function generateSpiralMatrix(n, clockwise = true) {
+            const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+            const directions = clockwise
+                ? [[0, 1], [1, 0], [0, -1], [-1, 0]] // Soat strelkasi bo'yicha
+                : [[1, 0], [0, 1], [-1, 0], [0, -1]]; // Soat strelkasi qarama-qarshi
+
+            let row = 0, col = 0, dirIndex = 0, value = 1;
+
+            for (let i = 0; i < n * n; i++) {
+                matrix[row][col] = value++;
+
+                const nextRow = row + directions[dirIndex][0];
+                const nextCol = col + directions[dirIndex][1];
+
+                if (
+                    nextRow < 0 || nextRow >= n ||
+                    nextCol < 0 || nextCol >= n ||
+                    matrix[nextRow][nextCol] !== 0
+                ) {
+                    dirIndex = (dirIndex + 1) % 4;
+                }
+
+                row += directions[dirIndex][0];
+                col += directions[dirIndex][1];
+            }
+
+            return matrix;
+        }
+
+        function generateAndDisplayMatrix() {
+            const directionInputs = document.getElementsByName('direction');
+            let directionInput = true; // Default to clockwise
+
+            directionInputs.forEach(input => {
+                if (input.checked) {
+                    directionInput = input.value === 'true';
+                }
+            });
+
+            const n = 7; // Matritsa o'lchamini 7 ga 7 ga o'rnatish
+            const matrix = generateSpiralMatrix(n, directionInput);
+
+            const matrixContainer = document.getElementById('matrix');
+            matrixContainer.innerHTML = '';
+
+            matrix.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row';
+
+                row.forEach(cell => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+                    cellDiv.textContent = cell;
+                    rowDiv.appendChild(cellDiv);
+                });
+
+                matrixContainer.appendChild(rowDiv);
+            });
+        }
+
+        // Avval matritsani avtomatik yaratish
+        window.onload = generateAndDisplayMatrix;
+    </script>
+</body>
+</html>
